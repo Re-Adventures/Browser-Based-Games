@@ -1,3 +1,8 @@
+/// Prince game
+/// Date: 17-Aug-24
+
+/// Multi screen game
+
 const SCALING_FACTOR = 2;
 
 let canvas: any;
@@ -79,7 +84,6 @@ document.addEventListener("keydown", MovePlayer);
 document.addEventListener("keyup", StopPlayer);
 
 class Asset {
-    background: any;
     player: {
         idle: PlayerSprite;
         run:  PlayerSprite;
@@ -113,6 +117,15 @@ class Asset {
         PinkDesign: PlatformDesign;
         BronzeStone: StoneSprite;
         GoldStone: StoneSprite;
+    };
+    background: {
+        blue: HTMLImageElement;
+        brown: HTMLImageElement;
+        gray: HTMLImageElement;
+        green: HTMLImageElement;
+        pink: HTMLImageElement;
+        purple: HTMLImageElement;
+        yellow: HTMLImageElement;
     };
 
 
@@ -881,6 +894,7 @@ function CreateLevel1() {
     
 }
 
+let backgroundScrollCounter = 0;
 /// The function where all the animation & drawing will happen
 function Draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -889,7 +903,10 @@ function Draw() {
     // ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Drawing the background
-    DrawBackground(assets.background.yellow);
+    let selectedBackground = assets.background.brown;
+    DrawBackground(selectedBackground, backgroundScrollCounter);
+
+    backgroundScrollCounter = (backgroundScrollCounter + .25) % selectedBackground.width;
 
     player.update();
     for (let platform of platforms) {
@@ -898,14 +915,15 @@ function Draw() {
 }
 
 /// Draws the background with the image tile provided
-function DrawBackground(image: HTMLImageElement) {
+/// `startDrawingY` is used for scrolling the background
+function DrawBackground(image: HTMLImageElement, startDrawingY: number) {
     let totalRows = Math.ceil(canvas.width / 64);
     let totalCols = Math.ceil(canvas.height / 64);
     
-    // TODO: Scroll the backgrond downwards
-    for (let row = 0; row < totalRows; row++) {
-        for (let col = 0; col < totalCols; col++) {
-            ctx.drawImage(image, row * image.width, col * image.height);
+    for (let row = -1; row < totalRows; row++) {
+        for (let col = -1; col < totalCols; col++) {
+            ctx.drawImage(
+                image, row * image.width, col * image.height + startDrawingY);
         }
     }
 }
